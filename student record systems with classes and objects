@@ -1,0 +1,177 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+class Student {
+private:
+    int roll_number;
+    string name;
+    vector<float> marks;
+
+public:
+    // Default Constructor
+    Student() {
+        roll_number = 0;
+        name = "Unknown";
+    }
+
+    // Parameterized Constructor (full info)
+    Student(int r, string n, vector<float> m) {
+        roll_number = r;
+        name = n;
+        marks = m;
+    }
+
+    // Overloaded Constructor (only roll number)
+    Student(int r) {
+        roll_number = r;
+        name = "Not Assigned";
+    }
+
+    // Destructor
+    ~Student() {
+        // Cleanup if needed
+        // (not required here since no dynamic memory)
+        cout << "Destructor called for Roll No: " << roll_number << endl;
+    }
+
+    // Add student details
+    void addStudent() {
+        cout << "Enter Roll Number: ";
+        cin >> roll_number;
+
+        cout << "Enter Name: ";
+        cin.ignore();
+        getline(cin, name);
+
+        int n;
+        cout << "Enter number of subjects: ";
+        cin >> n;
+
+        marks.clear();
+        float m;
+        for (int i = 0; i < n; i++) {
+            cout << "Enter marks for subject " << i + 1 << ": ";
+            cin >> m;
+            marks.push_back(m);
+        }
+    }
+
+    // Overloaded addStudent (polymorphism)
+    void addStudent(int r, string n, vector<float> m) {
+        roll_number = r;
+        name = n;
+        marks = m;
+    }
+
+    // Modify student details
+    void modifyStudent() {
+        cout << "Modify Name: ";
+        cin.ignore();
+        getline(cin, name);
+
+        int n;
+        cout << "Enter new number of subjects: ";
+        cin >> n;
+
+        marks.clear();
+        float m;
+        for (int i = 0; i < n; i++) {
+            cout << "Enter new marks for subject " << i + 1 << ": ";
+            cin >> m;
+            marks.push_back(m);
+        }
+    }
+
+    // Display student details
+    void displayStudent() {
+        cout << "\nRoll Number: " << roll_number << endl;
+        cout << "Name: " << name << endl;
+        cout << "Marks: ";
+        for (float m : marks) {
+            cout << m << " ";
+        }
+        cout << endl;
+        cout << "Average Marks: " << calculateAverage() << endl;
+    }
+
+    // Calculate average marks
+    float calculateAverage() {
+        if (marks.size() == 0) return 0;
+
+        float sum = 0;
+        for (float m : marks) {
+            sum += m;
+        }
+        return sum / marks.size();
+    }
+
+    // Getter for roll number (for searching)
+    int getRollNumber() {
+        return roll_number;
+    }
+};
+
+// ----------- MAIN FUNCTION -----------
+int main() {
+    vector<Student> students;
+    int choice;
+
+    do {
+        cout << "\n--- Student Record System ---\n";
+        cout << "1. Add Student\n";
+        cout << "2. Modify Student\n";
+        cout << "3. Display All Students\n";
+        cout << "4. Exit\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+
+        if (choice == 1) {
+            Student s;
+            s.addStudent();
+            students.push_back(s);
+        }
+        else if (choice == 2) {
+            int roll;
+            cout << "Enter Roll Number to modify: ";
+            cin >> roll;
+
+            bool found = false;
+            for (auto &s : students) {
+                if (s.getRollNumber() == roll) {
+                    s.modifyStudent();
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                cout << "Student not found!\n";
+            }
+        }
+        else if (choice == 3) {
+            for (auto &s : students) {
+                s.displayStudent();
+            }
+        }
+
+    } while (choice != 4);
+
+    return 0;
+}  
+
+
+output  
+Roll Number: 12
+Name: raman
+Marks: 67 78 79 90 82
+Average Marks: 79.2
+
+Roll Number: 15
+Name: surya
+Marks: 80 82 89
+Average Marks: 83.6667
+
+Roll Number: 18
+Name: priya
+Marks: 75 85 80 90
+Average Marks: 82.5
