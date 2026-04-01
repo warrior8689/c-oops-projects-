@@ -1,0 +1,117 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+using namespace std;
+
+class Employee {
+private:
+    int employee_id;
+    string name;
+    double base_salary;
+    double bonus;
+    double deduction;
+    double final_salary;
+
+public:
+    // Default constructor
+    Employee() : employee_id(0), name(""), base_salary(0), bonus(0), deduction(0), final_salary(0) {}
+
+    // Parameterized constructor
+    Employee(int id, string n, double b_salary, double b, double d) {
+        employee_id = id;
+        name = n;
+        base_salary = b_salary;
+        bonus = b;
+        deduction = d;
+        final_salary = 0;
+    }
+
+    // Calculate salary
+    void calculateSalary() {
+        final_salary = base_salary + bonus - deduction;
+    }
+
+    // Display employee info
+    void display() {
+        cout << "ID: " << employee_id
+             << ", Name: " << name
+             << ", Base: " << base_salary
+             << ", Bonus: " << bonus
+             << ", Deduction: " << deduction
+             << ", Final Salary: " << final_salary << endl;
+    }
+
+    // Serialize employee data to file
+    string serialize() {
+        return to_string(employee_id) + "," + name + "," + to_string(base_salary) + "," +
+               to_string(bonus) + "," + to_string(deduction) + "," + to_string(final_salary);
+    }
+
+    // Deserialize from a line in file
+    static Employee deserialize(const string& line) {
+        int id;
+        string n;
+        double b_salary, b, d;
+        size_t pos = 0, start = 0;
+        string parts[5];
+        int i = 0;
+
+        while ((pos = line.find(',', start)) != string::npos && i < 5) {
+            parts[i++] = line.substr(start, pos - start);
+            start = pos + 1;
+        }
+        parts[i] = line.substr(start);
+
+        id = stoi(parts[0]);
+        n = parts[1];
+        b_salary = stod(parts[2]);
+        b = stod(parts[3]);
+        d = stod(parts[4]);
+
+        return Employee(id, n, b_salary, b, d);
+    }
+};
+
+int main() {
+    vector<Employee> employees;
+    ifstream infile("employees.txt");
+    if (!infile) {
+        cerr << "Error: Cannot open employees.txt for reading!" << endl;
+        return 1;
+    }
+
+    string line;
+    while (getline(infile, line)) {
+        if (line.empty()) continue;
+        Employee emp = Employee::deserialize(line);
+        emp.calculateSalary();
+        employees.push_back(emp);
+    }
+    infile.close();
+
+    // Display all employees
+    cout << "Updated Employee Records:\n";
+    for (auto &emp : employees) {
+        emp.display();
+    }
+
+    // Write back to file
+    ofstream outfile("employees.txt");
+    if (!outfile) {
+        cerr << "Error: Cannot open employees.txt for writing!" << endl;
+        return 1;
+    }
+
+    for (auto &emp : employees) {
+        outfile << emp.serialize() << endl;
+    }
+    outfile.close();
+
+    cout << "\nEmployee records updated successfully in employees.txt\n";
+
+    return 0;
+} 
+
+output data provided 101,sandeep ,50000,5000,2000,53000  102,diksha,45000,3000,1500,46500 103,rahul,55000,4000,2500,56500
+final output provided 101,sandeep ,50000,5000,2000,53000  102,diksha,45000,3000,1500,46500 103,rahul,55000,4000,2500,56500
